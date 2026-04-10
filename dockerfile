@@ -1,0 +1,11 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY ecs-blue/ .
+
+RUN npm install
+
+EXPOSE 8081
+
+CMD ["node", "app.js"]
