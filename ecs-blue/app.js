@@ -1,10 +1,10 @@
-const express = require('express');
-const app = express();
+const http = require("http");
 
-app.get('/api', (req, res) => {
-  res.json({ message: "Hello - I'm BLUE" });
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("blue running");
 });
 
-app.listen(8081, () => {
-  console.log("Blue running");
+server.listen(3000, "0.0.0.0", () => {
+  console.log("Server running on port 3000");
 });

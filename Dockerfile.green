@@ -2,10 +2,10 @@ FROM node:18
 
 WORKDIR /app
 
-COPY ecs-blue/ .
+COPY ecs-green/ .
 
 RUN npm install
 
-EXPOSE 8081
+EXPOSE 3000
 
 CMD ["node", "app.js"]
