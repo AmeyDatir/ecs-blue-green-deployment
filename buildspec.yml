@@ -1,18 +1,32 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-east-1
+    IMAGE_REPO_NAME: ca-container-registry
+    CONTAINER_NAME: ecs-container
+
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 349660737678.dkr.ecr.us-east-1.amazonaws.com
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPO_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URI
 
   build:
     commands:
-      - echo Build started
+      - echo Build started...
       - docker build -t ecs-app .
-      - docker tag ecs-app:latest 349660737678.dkr.ecr.us-east-1.amazonaws.com/ca-container-registry:latest
+      - docker tag ecs-app:latest $REPO_URI:latest
 
   post_build:
     commands:
       - echo Pushing image...
-      - docker push 349660737678.dkr.ecr.us-east-1.amazonaws.com/ca-container-registry:latest
+      - docker push $REPO_URI:latest
+      - echo Creating imagedefinitions.json...
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPO_URI:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
