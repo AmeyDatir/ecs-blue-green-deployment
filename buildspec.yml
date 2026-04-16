@@ -1,30 +1,18 @@
 version: 0.2
 
-env:
-  variables:
-    AWS_DEFAULT_REGION: us-east-1
-    REPO_URI: 349660737678.dkr.ecr.us-east-1.amazonaws.com/ca-container-registry
-    CONTAINER_NAME: ecs-container
-
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URI
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 349660737678.dkr.ecr.us-east-1.amazonaws.com
 
   build:
     commands:
       - echo Build started
-      - docker build -t ecs-app .
-      - docker tag ecs-app:latest $REPO_URI:latest
+      - docker build -t ecs-blue -f Dockerfile.blue .
+      - docker tag ecs-blue:latest 349660737678.dkr.ecr.us-east-1.amazonaws.com/ca-container-registry:blue
 
   post_build:
     commands:
       - echo Pushing image...
-      - docker push $REPO_URI:latest
-      - echo Creating imagedefinitions.json...
-      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPO_URI:latest > imagedefinitions.json
-
-artifacts:
-  files:
-    - imagedefinitions.json
+      - docker push 349660737678.dkr.ecr.us-east-1.amazonaws.com/ca-container-registry:blue
