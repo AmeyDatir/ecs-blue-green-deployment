@@ -1,0 +1,9 @@
+version: 1.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: ecs-blue-green-task
+        LoadBalancerInfo:
+          ContainerName: ecs-container
+          ContainerPort: 3000
